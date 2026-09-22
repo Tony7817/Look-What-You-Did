@@ -14,7 +14,7 @@ description: 分批审查后端分支的接口、数据库、调用流程、文�
 - 先创建持久运行目录和 `state.json`，再读取变更内容。
 - 一个批次只读取一个边界明确的对象，例如一个接口、一个数据库对象、一个代码文件或 `8` 至 `15` 个测试。
 - 每个批次先写事实或章节文件，再更新覆盖清单，最后原子更新 `state.json`；状态文件只是可续跑提交标记，不是本轮停止点。
-- 最终文档必须在 `ASSEMBLE` 阶段写入仓库根目录的 `branch-change-content.md`，不得依赖压缩摘要临时重建。
+- 最终文档必须在 `ASSEMBLE` 阶段按功能名生成文件名并写入仓库根目录，不得依赖压缩摘要临时重建。文件名使用功能名的 kebab-case 加 `-change-document.md`，例如 `shopify-billing-renewal-reminder-change-document.md`。
 - 已完成的阶段不得重复全量扫描；恢复时以 `state.json` 和已落盘文件为准。
 - 上下文压缩摘要与持久文件冲突时，以持久文件为准。
 - 默认连续执行 `INIT` 到 `DONE`，不得因批次完成、阶段切换或已更新 `state.json` 主动停止。
@@ -95,7 +95,7 @@ reviews/
 | `FACTS_FLOWS` | `facts/flows/`、`inventory/flows.tsv` | 每个入口流程已有文件，全部逻辑文件已入图或标记入口待确认 |
 | `FACTS_FILES` | `facts/files/` | 每个变更文件已有文件事实 |
 | `TESTS` | `inventory/tests.tsv`、`sections/06-tests/` | 全部新增测试项为 `done` 或 N/A |
-| `ASSEMBLE` | `<repo_root>/branch-change-content.md` | 六个章节按规则装配完成 |
+| `ASSEMBLE` | `<repo_root>/<feature-name>-change-document.md` | 六个章节按规则装配完成 |
 | `REVIEW_FORMAT` | `reviews/format.md` | 格式复审通过 |
 | `REVIEW_CONTENT` | `reviews/content.md` | 内容复审通过 |
 | `REVIEW_COVERAGE` | `reviews/coverage.md` | 覆盖复审通过 |
@@ -153,6 +153,6 @@ reviews/
 
 ## 交付
 
-最终 Markdown 文件输出到仓库根目录下。`delivery.mode` 为 `full_markdown` 时，最后只读取已通过复审的 Markdown 文件作为回复；为 `file_path` 时，返回根目录下的 Markdown 文件和简短完成信息。
+最终 Markdown 文件按功能名生成并输出到仓库根目录下。`delivery.mode` 为 `full_markdown` 时，最后只读取已通过复审的 Markdown 文件作为回复；为 `file_path` 时，返回根目录下的 Markdown 文件和简短完成信息。
 
 不得在最终阶段重新分析代码、重新生成测试场景或根据压缩摘要重写文档。

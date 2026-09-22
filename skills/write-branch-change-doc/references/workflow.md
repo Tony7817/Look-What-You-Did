@@ -260,7 +260,7 @@ id	file	name	kind	start_line	end_line	status	fact_file
 - 每个变更文件都有 `facts/files/` 产物。
 - 每个接口、数据库对象和测试都有确定性事实文件。
 
-按 [document-format.md](document-format.md) 装配，最终交付文件固定写入 `<repo_root>/branch-change-content.md`：
+按 [document-format.md](document-format.md) 装配，使用功能名的 kebab-case 加 `-change-document.md` 生成文件名，并写入仓库根目录：
 
 ```text
 01-intro.md
@@ -269,18 +269,18 @@ id	file	name	kind	start_line	end_line	status	fact_file
 04-files.md
 05-database.md
 06-tests.md
-<repo_root>/branch-change-content.md
+<repo_root>/<feature-name>-change-document.md
 ```
 
 章节没有内容时跳过，后续章节顺延编号。
 
 不得在装配阶段重新阅读原始大文件。装配只读取已确认的事实文件和批次文件。
 
-`<repo_root>/branch-change-content.md` 写入并校验后，将 `phase` 更新为 `REVIEW_FORMAT`，并立即执行格式复审。
+最终 Markdown 文件写入并校验后，将 `phase` 更新为 `REVIEW_FORMAT`，并立即执行格式复审。
 
 ## REVIEW_FORMAT
 
-完整读取 `<repo_root>/branch-change-content.md` 和 [document-format.md](document-format.md)，逐项检查：
+完整读取最终 Markdown 文件和 [document-format.md](document-format.md)，逐项检查：
 
 - 标题、分支和基线头部。
 - 章节顺序、标题层级和空分组。
@@ -296,7 +296,7 @@ id	file	name	kind	start_line	end_line	status	fact_file
 
 ## REVIEW_CONTENT
 
-完整读取 `<repo_root>/branch-change-content.md` 和相关事实文件，逐章核对：
+完整读取最终 Markdown 文件和相关事实文件，逐章核对：
 
 - 接口字段类型和值。
 - 数据库字段、默认值、约束和索引。
