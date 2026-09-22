@@ -1,9 +1,9 @@
 ---
-name: write-branch-change-doc-v2
+name: write-branch-change-doc
 description: 分批审查后端分支的接口、数据库、调用流程、文件变更和本分支新增测试，持续落盘并生成可续跑的固定结构 Markdown 变更说明；适用于大型分支或上下文受限环境。
 ---
 
-# 后端分支变更说明 V2
+# 后端分支变更说明
 
 目标与 `write-branch-change-doc` 相同，但执行方式改为文件驱动的状态机。完整性来自持久文件和覆盖清单，不依赖模型把所有材料同时保存在上下文中。
 
@@ -30,7 +30,7 @@ description: 分批审查后端分支的接口、数据库、调用流程、文�
 优先使用环境变量 `BRANCH_CHANGE_DOC_RUN_ROOT`。未设置时使用：
 
 ```text
-${CODEX_HOME:-$HOME/.codex}/tmp/write-branch-change-doc-v2/<repo-hash>/<branch-slug>/
+${CODEX_HOME:-$HOME/.codex}/tmp/write-branch-change-doc/<repo-hash>/<branch-slug>/
 ```
 
 目录结构：

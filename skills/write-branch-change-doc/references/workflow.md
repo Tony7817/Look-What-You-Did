@@ -1,6 +1,6 @@
 # 可续跑执行流程
 
-本文件定义 `write-branch-change-doc-v2` 的详细阶段。每次开始或恢复任务时完整读取。
+本文件定义 `write-branch-change-doc` 的详细阶段。每次开始或恢复任务时完整读取。
 
 ## 目录和状态
 
