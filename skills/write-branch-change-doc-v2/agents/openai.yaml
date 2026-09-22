@@ -1,0 +1,4 @@
+interface:
+  display_name: "分支变更说明 V2"
+  short_description: "分批生成可续跑的后端分支变更说明，覆盖接口、数据库、流程、文件与测试。"
+  default_prompt: "使用 $write-branch-change-doc-v2 分批生成可续跑的分支变更说明文档。"
