@@ -21,7 +21,8 @@ description: 分批审查后端分支的接口、数据库、调用流程、文�
 - 只有用户明确要求暂停，或外部依赖使当前批次无法安全完成时，才允许输出异常断点报告。
 - 新增测试索引中的每个测试都必须有终态；不得只处理代表性测试。
 - 不确定的信息标记“待确认”，不得编造。
-- 文件事实和最终文档只描述本次 diff 触及的业务行为差异，不复述未变化的上游解析、下游调用链或既有业务分支。
+- 文件事实和修改内容章节只描述本次 diff 触及的业务行为差异；入口时序图例外，必须展示当前完整时序，并标记本次变更。
+- 每个已确认变更入口的文件变更图下必须紧接完整 Mermaid 时序图。参与者按 client、service（后端服务）、DB、redis、agent、三方服务划分，只显示实际参与的角色；变更标记统一放在 `Note over` 说明框中，不放在箭头或分支标题中；方框只用于变更说明，其余步骤使用虚线箭头，内部处理指向自身；同步调用必须同时画请求与返回；具体格式见 [references/document-format.md](references/document-format.md)。
 - 不主动连接外部数据库。数据库结构以迁移、DDL、ORM schema 或仓库内定义为准。
 - 不执行测试，除非用户另行明确要求；本技能只分析本分支新增测试。
 
@@ -92,7 +93,7 @@ reviews/
 | `INVENTORY` | `inventory/changed-files.tsv` | 全部新增、修改、删除路径已登记 |
 | `FACTS_API` | `facts/apis/`、`inventory/apis.tsv` | 全部接口项为 `done` 或 N/A |
 | `FACTS_DATABASE` | `facts/database/`、`inventory/database.tsv` | 全部数据库项为 `done` 或 N/A |
-| `FACTS_FLOWS` | `facts/flows/`、`inventory/flows.tsv` | 每个入口流程已有文件，全部逻辑文件已入图或标记入口待确认 |
+| `FACTS_FLOWS` | `facts/flows/`、`inventory/flows.tsv` | 每个已确认入口均有文件变更图和完整时序图，全部逻辑文件已入图或标记入口待确认 |
 | `FACTS_FILES` | `facts/files/` | 每个变更文件已有文件事实 |
 | `TESTS` | `inventory/tests.tsv`、`sections/06-tests/` | 全部新增测试项为 `done` 或 N/A |
 | `ASSEMBLE` | `<repo_root>/<feature-name>-change-document.md` | 六个章节按规则装配完成 |
@@ -128,7 +129,7 @@ reviews/
 4. 一致时从 `phase` 和 `cursor` 继续。
 5. 只读取当前批次及对应事实文件。
 6. 不重新执行已标记完成且产物存在的阶段。
-7. 如果状态为完成但产物缺失，将该阶段回退到未完成，不重新创建整个运行目录。
+7. 如果状态为完成但产物缺失，将该阶段回退到未完成，不重新创建整个运行目录。旧流程产物缺少完整时序图时，仅将对应入口回退到 `FACTS_FLOWS` 补齐，重新装配并执行三次复审；保留其它已完成事实。
 8. 完成当前阶段后按阶段推进协议更新 `state.json`，并立即处理新 `phase` 的第一个批次。恢复或压缩上下文后也不得因阶段切换主动停止。
 
 ## 异常断点报告

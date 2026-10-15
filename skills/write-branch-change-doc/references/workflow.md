@@ -168,7 +168,14 @@ id	entry_type	entry_file	source	fact_file	status
 4. 无法关联入口的修改文件写“入口待确认”。
 5. 只包含参与代码或业务逻辑的文件；迁移、配置、纯文档和生成产物排除。
 
-每个流程事实文件包含可直接装配的 Mermaid 片段，节点标签只使用文件名。
+每个流程事实文件按顺序保存可直接装配的文件变更图和完整时序图：
+
+- 文件变更图使用 Mermaid `flowchart`，节点标签只使用文件名。
+- 时序图使用 Mermaid `sequenceDiagram`，紧接文件变更图，按 client、service（后端服务）、DB、redis、agent、三方服务的实际参与角色描述当前入口从触发到结束的完整交互；具体粒度和变更标记遵循 [document-format.md](document-format.md)。
+- 为还原完整时序，可读取该入口必要的未变化代码；只按角色交互汇总，不展开未变化的函数调用细节。比较基线，确认哪些交互、条件、顺序或副作用属于新增、修改、删除。
+- 在同一事实文件中记录参与者、关键交互及分支的代码来源，供内容复审使用；装配最终文档时只提取图和必要说明。
+- 一个入口存在多个事件分支时，使用 `alt` / `opt` / `loop` 等表达实际分支，不将互斥路径画成连续执行。
+- 两张图和时序来源均确认后，才能将入口标记为 `done`。入口待确认的对象不得编造触发方或完整时序。
 
 每完成一个流程，立即写事实文件，将对应清单项标记为 `done`，并更新 `cursor.next_flow_index` 和 `state.json`。处理完全部流程后，将 `inventory/changed-files.tsv` 中所有代码或业务逻辑变更文件与流程事实中的节点文件对照；未入图文件必须补入对应流程，无法关联入口时写入 `facts/flows/unlinked.md` 并标记“入口待确认”。
 
@@ -256,6 +263,7 @@ id	file	name	kind	start_line	end_line	status	fact_file
 - `changed-files.tsv` 全部为 `done`。
 - `apis.tsv`、`database.tsv` 全部为 `done` 或 N/A。
 - `flows.tsv` 全部为 `done` 或 N/A，且全部代码或业务逻辑变更文件已入图或标记“入口待确认”。
+- 每个已确认入口均有文件变更图及其下方的完整时序图；时序已保存到事实文件，不在装配阶段临时推断。
 - `tests.tsv` 全部为 `done` 或 N/A。
 - 每个变更文件都有 `facts/files/` 产物。
 - 每个接口、数据库对象和测试都有确定性事实文件。
@@ -286,7 +294,8 @@ id	file	name	kind	start_line	end_line	status	fact_file
 - 章节顺序、标题层级和空分组。
 - JSON 多行格式、嵌套字段和接口当前/原始顺序。
 - 第三章每个入口是否先标注实际的变更入口，再标注协议是否变更；接口使用路由，consumer 使用 consumer 名称。
-- 图例与流程图使用完全相同且语义一致的 Mermaid `classDef` 色块，入口和节点标签正确。
+- 图例与文件变更图使用完全相同且语义一致的 Mermaid `classDef` 色块，入口和节点标签正确。
+- 每个已确认入口的文件变更图下紧接 `sequenceDiagram`；参与者符合规定粒度且全部实际参与；时序中的新增、修改、删除统一放在 `Note over` 说明框内，箭头与分支标题没有混入变更标记；方框没有普通业务说明，所有交互使用虚线箭头，内部处理使用自身箭头；同步调用有请求和结果返回，异步投递不伪造业务完成；未变化交互不误标。时序图不使用仅适用于文件变更图的 `classDef`。
 - 字段表、约束索引表、测试表。
 - 不存在 skill 禁止的元信息、注记或额外章节。
 
@@ -301,6 +310,7 @@ id	file	name	kind	start_line	end_line	status	fact_file
 - 接口字段类型和值。
 - 数据库字段、默认值、约束和索引。
 - 代码流程调用关系和文件分类。
+- 每个入口的完整时序与代码一致：触发来源、角色交互顺序、主要分支、返回或任务结束、事务提交／回滚、锁释放及提交后副作用；变更标记与基线差异一致，删除交互只作历史说明。
 - 每个修改文件的业务变化、当前逻辑和之前逻辑。
 - 修改文件的内容仅聚焦本次 diff 的行为差异，没有复述未变化的上游解析、下游调用链或既有业务分支。
 - 测试场景与实际断言一致。
@@ -316,7 +326,7 @@ id	file	name	kind	start_line	end_line	status	fact_file
 - `inventory/changed-files.tsv` 与第四章文件标题。
 - `inventory/apis.tsv` 与接口章节。
 - `inventory/database.tsv` 与表结构章节。
-- `inventory/flows.tsv` 和流程章节中全部代码或业务逻辑变更文件。
+- `inventory/flows.tsv` 与每个入口的一张文件变更图及其下方的一张完整时序图，并核对全部代码或业务逻辑变更文件。
 - `inventory/tests.tsv` 与测试章节中每个新增测试名。
 
 检查：
@@ -326,6 +336,7 @@ id	file	name	kind	start_line	end_line	status	fact_file
 - 没有重复行导致虚增覆盖。
 - 所有状态均为 `done` 或 N/A。
 - 文件数、接口数、数据库对象数和新增测试数与索引一致。
+- 每个已确认入口均覆盖两种图；完整时序既包含必要的未变化交互，也包含本次变更的实际交互及关键分支，不遗漏角色或用占位角色凑图。
 
 将结论、问题和修正写入 `reviews/coverage.md`。发现问题时修正对应产物并重新执行受影响的复审；结构变化必须重新执行全部三次复审。
 
